@@ -3186,7 +3186,7 @@ void eio_clean_for_reboot(struct cache_c *dmc)
 
 /*
  * Used during the partial cache set clean.
- * Uses reclaim policy(LRU/FIFO) information to
+ * Uses reclaim policy(LRU/FIFO/LFU) information to
  * identify the cache blocks that needs cleaning.
  * The number of such cache blocks is determined
  * by the high and low thresholds set.

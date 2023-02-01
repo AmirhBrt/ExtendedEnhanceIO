@@ -24,7 +24,7 @@ ifneq "$(OPENVZ_VER)" ""
         RHEL5_TREE := /usr/src/redhat/BUILD/ovzkernel-2.6.18/linux-$(shell uname -r).$(shell uname -i)
         KERNEL_TREE := $(RHEL5_TREE)
 endif
-obj-m	+= enhanceio.o enhanceio_lru.o enhanceio_fifo.o  enhanceio_rand.o
+obj-m	+= enhanceio.o enhanceio_lru.o enhanceio_fifo.o enhanceio_lfu.o  enhanceio_rand.o
 enhanceio-y	+= \
 	eio_conf.o \
 	eio_ioctl.o \
@@ -36,6 +36,7 @@ enhanceio-y	+= \
 	eio_subr.o \
 	eio_ttc.o
 enhanceio_fifo-y	+= eio_fifo.o
+enhanceio_lfu-y     += eio_lfu.o
 enhanceio_rand-y	+= eio_rand.o
 enhanceio_lru-y	+= eio_lru.o
 .PHONY: all
@@ -49,6 +50,7 @@ modules_install: modules
 	install -o root -g root -m 0755 enhanceio.ko $(DESTDIR)/lib/modules/$(KERNEL_SOURCE_VERSION)/extra/enhanceio/
 	install -o root -g root -m 0755 enhanceio_rand.ko $(DESTDIR)/lib/modules/$(KERNEL_SOURCE_VERSION)/extra/enhanceio/
 	install -o root -g root -m 0755 enhanceio_fifo.ko $(DESTDIR)/lib/modules/$(KERNEL_SOURCE_VERSION)/extra/enhanceio/
+	install -o root -g root -m 0755 enhanceio_lfu.ko $(DESTDIR)/lib/modules/$(KERNEL_SOURCE_VERSION)/extra/enhanceio/
 	install -o root -g root -m 0755 enhanceio_lru.ko $(DESTDIR)/lib/modules/$(KERNEL_SOURCE_VERSION)/extra/enhanceio/
 	depmod -a
 .PHONY: install
