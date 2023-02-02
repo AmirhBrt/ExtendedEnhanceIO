@@ -150,7 +150,7 @@ int lfu_touch(struct lfu_ls *llist, index_t index){
     if (!llist || (index >= llist->ll_max))
         return -EINVAL;
 
-    u_int64_t key = llist->ll_elem[*index].le_key;
+    u_int64_t key = llist->ll_elem[index].le_key;
     lfu_rem(llist, index);
     lfu_add(llist, index, key + 1);
     return 0;
