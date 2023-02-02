@@ -78,7 +78,7 @@ int lfu_add(struct lfu_ls *llist, index_t index, u_int64_t key)
         index_t dest_index = index;
         while (counter > 1) {
             prev_index = llist->ll_elem[prev_index].le_prev;
-            if (llist->ll_elem[index].le_key < llist->llelem[prev_index].le_key){
+            if (llist->ll_elem[index].le_key < llist->ll_elem[prev_index].le_key){
                 dest_index = prev_index;
             } else {
                 break;
