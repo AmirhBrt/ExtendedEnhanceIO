@@ -6,7 +6,7 @@ COMMIT_REV ?= $(shell echo)
 KERNEL_SOURCE_VERSION ?= $(shell uname -r)
 KERNEL_TREE ?= /lib/modules/$(KERNEL_SOURCE_VERSION)/build
 EXTRA_CFLAGS += -I$(KERNEL_TREE)/drivers/md -I./ -DCOMMIT_REV="\"$(COMMIT_REV)\""
-EXTRA_CFLAGS += -I$(KERNEL_TREE)/include/ -I$(KERNEL_TREE)/include/linux 
+EXTRA_CFLAGS += -I$(KERNEL_TREE)/include/ -I$(KERNEL_TREE)/include/linux
 # Check for RHEL/CentOS
 RHEL5_VER ?= $(shell  if [ -e /etc/redhat-release ]; then grep 5.[0-9] /etc/redhat-release; else false; fi)
 RHEL5_SETUP :=
@@ -24,7 +24,7 @@ ifneq "$(OPENVZ_VER)" ""
         RHEL5_TREE := /usr/src/redhat/BUILD/ovzkernel-2.6.18/linux-$(shell uname -r).$(shell uname -i)
         KERNEL_TREE := $(RHEL5_TREE)
 endif
-obj-m	+= enhanceio.o enhanceio_fifo.o enhanceio_lfu.o  enhanceio_rand.o
+obj-m	+= enhanceio.o enhanceio_lfu.o enhanceio_fifo.o  enhanceio_rand.o
 enhanceio-y	+= \
 	eio_conf.o \
 	eio_ioctl.o \
@@ -36,10 +36,10 @@ enhanceio-y	+= \
 	eio_subr.o \
 	eio_ttc.o
 enhanceio_fifo-y	+= eio_fifo.o
-enhanceio_lfu-y     += eio_lfu.o
 enhanceio_rand-y	+= eio_rand.o
+enhanceio_lfu-y	+= eio_lfu.o
 .PHONY: all
-all: modules 
+all: modules
 .PHONY:    modules
 modules: $(RHEL5_SETUP)
 	make -C $(KERNEL_TREE) M=$(PWD) modules V=0
@@ -63,4 +63,3 @@ rhel5-setup: $(RHEL5_TREE)
 	ln -s -f $(RHEL5_SRC)/Module.symvers $(RHEL5_TREE)/Module.symvers
 $(RHEL5_TREE):
 	rpmbuild -bp --target=`uname -m` $(RHEL5_SPEC) 2>&1 | tee `dirname $(RHEL5_SPEC)`/prep.log
-
