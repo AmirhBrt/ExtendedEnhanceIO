@@ -5,7 +5,7 @@ clear
 # Cache Variables
 source_device="/dev/sdb1"
 cache_device="/dev/sdc1"
-cache_policy="lru"
+cache_policy="lfu"
 cache_mode="wt"
 cache_block_size="4096"
 cache_name="cache1"

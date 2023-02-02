@@ -50,9 +50,8 @@ Specifies the Cache name\&.
 \fR\fB\f\[\-p <policy>]\fR\fR
 .RS 4
 Cache block replacement policy\&. Policies are: 
-\fBlru\fR,
-\fBfifo(default)\fR,
 \fBlfu\fR,
+\fBfifo(default)\fR,
 \fBrand(random)\fR\&.
 .RE
 .PP
@@ -112,9 +111,8 @@ Specifies the Cache name\&.
 \fR\fB\f\[\-p <policy>]\fR\fR
 .RS 4
 Cache block replacement policy\&. Policies are: 
-\fBlru\fR,
-\fBfifo(default)\fR,
 \fBlfu\fR,
+\fBfifo(default)\fR,
 \fBrand(random)\fR\&.
 .RE
 .PP
@@ -130,7 +128,7 @@ Specifies the caching mode\&. Supported caching modes are:
 .SH EXAMPLES
 
 # Create a cache 
-    $ eio_cli create \-d /dev/sdg \-s /dev/sdf \-p lru \-m wt \-c SDG_CACHE
+    $ eio_cli create \-d /dev/sdg \-s /dev/sdf \-p lfu \-m wt \-c SDG_CACHE
     $ eio_cli create \-d /dev/sdm \-s /dev/sdk \-c SDM_CACHE
     $ eio_cli create \-d /dev/sdc1 \-s /dev/sdd1 \-c SDC1_CACHE
 

@@ -32,8 +32,8 @@
  */
 
 /*
- * The LRU pointers are maintained as set-relative offsets, instead of
- * pointers. This enables us to store the LRU pointers per cacheblock
+ * LFU pointers are maintained as set-relative offsets, instead of
+ * pointers. This enables us to store LFU pointers per cacheblock
  * using 4 bytes instead of 16 bytes. The upshot of this is that we
  * are required to clamp the associativity at an 8K max.
  *
@@ -41,24 +41,25 @@
  * maximum associativity should be 32K (2^15) and not 8K.
  */
 #define EIO_MAX_ASSOC   8192
-#define EIO_LRU_NULL    0xFFFF
+#define EIO_LFU_NULL    0xFFFF
 
 /* Declerations to keep the compiler happy */
 struct cache_c;
 struct eio_policy;
-struct eio_lru;
+struct eio_lfu;
 
-/* LRU specific data structures and functions */
-struct eio_lru {
-	void (*sl_lru_pushblks)(struct eio_policy *);
-	void (*sl_reclaim_lru_movetail)(struct cache_c *, index_t,
-					struct eio_policy *);
+/* LFU specific data structures and functions */
+struct eio_lfu {
+    void (*sl_lfu_pushblks)(struct eio_policy *);
+    void (*sl_reclaim_lfu_movetail)(struct cache_c *, index_t,
+                                    struct eio_policy *);
 };
 
-/* Function prototypes for LRU wrappers in eio_policy.c */
-void eio_policy_lru_pushblks(struct eio_policy *);
-void eio_policy_reclaim_lru_movetail(struct cache_c *, index_t,
-				     struct eio_policy *);
+
+/* Function prototypes for LFU wrappers in eio_policy.c */
+void eio_policy_lfu_pushblks(struct eio_policy *);
+void eio_policy_reclaim_lfu_movetail(struct cache_c *, index_t,
+                                     struct eio_policy *);
 
 /*
  * Context that captures the cache block replacement policy.
@@ -67,7 +68,7 @@ void eio_policy_reclaim_lru_movetail(struct cache_c *, index_t,
 struct eio_policy {
 	int sp_name;
 	union {
-		struct eio_lru *lru;
+		struct eio_lfu *lfu;
 	} sp_policy;
 	int (*sp_repl_init)(struct cache_c *);
 	void (*sp_repl_exit)(void);

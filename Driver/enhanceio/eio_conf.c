@@ -1821,7 +1821,7 @@ init:
 		vfree((void *)EIO_CACHE(dmc));
 		goto bad5;
 	}
-	eio_policy_lru_pushblks(dmc->policy_ops);
+    eio_policy_lfu_pushblks(dmc->policy_ops);
 
 	if (dmc->mode == CACHE_MODE_WB) {
 		error = eio_allocate_wb_resources(dmc);
@@ -1869,8 +1869,8 @@ init:
 			atomic64_inc(&dmc->nr_dirty);
 			cur_set = EIO_DIV(i, dmc->assoc);
 			if (prev_set != cur_set) {
-				/* Move the given set at the head of the set LRU list */
-				eio_touch_set_lru(dmc, cur_set);
+				/* Move the given set at the head of the set LFU list */
+                eio_touch_set_lfu(dmc, cur_set);
 				prev_set = cur_set;
 			}
 		}
@@ -2193,7 +2193,7 @@ int eio_ctr_ssd_add(struct cache_c *dmc, char *dev)
 			("ctr_ssd_add: Failed to allocate memory for cache policy");
 		goto out;
 	}
-	eio_policy_lru_pushblks(dmc->policy_ops);
+    eio_policy_lfu_pushblks(dmc->policy_ops);
 	if (dmc->mode != CACHE_MODE_WB)
 		/* Cold cache will reset the stats */
 		memset(&dmc->eio_stats, 0, sizeof(dmc->eio_stats));
@@ -2302,25 +2302,25 @@ int eio_allocate_wb_resources(struct cache_c *dmc)
 	/*
 	 * For writeback cache:
 	 * 1. Initialize the time based clean work queue
-	 * 2. Initialize the dirty set lru
+	 * 2. Initialize the dirty set lfu
 	 * 3. Initialize clean thread
 	 */
 
 	/*
 	 * Reset dmc->is_clean_aged_sets_sched.
-	 * Time based clean will be enabled in eio_touch_set_lru()
+	 * Time based clean will be enabled in eio_touch_set_lfu()
 	 * only when dmc->is_clean_aged_sets_sched  is zero and
 	 * dmc->sysctl_active.time_based_clean_interval > 0.
 	 */
 
 	dmc->is_clean_aged_sets_sched = 0;
 	INIT_DELAYED_WORK(&dmc->clean_aged_sets_work, eio_clean_aged_sets);
-	dmc->dirty_set_lru = NULL;
+	dmc->dirty_set_lfu = NULL;
 	ret =
-		lru_init(&dmc->dirty_set_lru,
+		lfu_init(&dmc->dirty_set_lfu,
 			 (dmc->size >> dmc->consecutive_shift));
 	if (ret == 0) {
-		spin_lock_init(&dmc->dirty_set_lru_lock);
+		spin_lock_init(&dmc->dirty_set_lfu_lock);
 		ret = eio_clean_thread_init(dmc);
 	}
 	EIO_ASSERT(dmc->mdupdate_q == NULL);
@@ -2329,11 +2329,11 @@ int eio_allocate_wb_resources(struct cache_c *dmc)
 		ret = -ENOMEM;
 
 	if (ret < 0) {
-		pr_err("cache_create: Failed to initialize dirty lru set or" \
+		pr_err("cache_create: Failed to initialize dirty lfu set or" \
 		       "clean/mdupdate thread for wb cache.\n");
-		if (dmc->dirty_set_lru) {
-			lru_uninit(dmc->dirty_set_lru);
-			dmc->dirty_set_lru = NULL;
+		if (dmc->dirty_set_lfu) {
+			lfu_uninit(dmc->dirty_set_lfu);
+			dmc->dirty_set_lfu = NULL;
 		}
 
 		eio_free_wb_pages(dmc->clean_mdpages, dmc->mdpage_count);
@@ -2368,9 +2368,9 @@ void eio_free_wb_resources(struct cache_c *dmc)
 		destroy_workqueue(dmc->mdupdate_q);
 		dmc->mdupdate_q = NULL;
 	}
-	if (dmc->dirty_set_lru) {
-		lru_uninit(dmc->dirty_set_lru);
-		dmc->dirty_set_lru = NULL;
+	if (dmc->dirty_set_lfu) {
+		lfu_uninit(dmc->dirty_set_lfu);
+		dmc->dirty_set_lfu = NULL;
 	}
 	if (dmc->clean_mdpages) {
 		eio_free_wb_pages(dmc->clean_mdpages, dmc->mdpage_count);

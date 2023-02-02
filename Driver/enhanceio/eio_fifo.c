@@ -185,7 +185,7 @@ struct eio_policy *eio_fifo_instance_init(void)
 
 	/* Initialize the FIFO specific functions and variables */
 	new_instance->sp_name = CACHE_REPL_FIFO;
-	new_instance->sp_policy.lru = NULL;
+	new_instance->sp_policy.lfu = NULL;
 	new_instance->sp_repl_init = eio_fifo_init;
 	new_instance->sp_repl_exit = eio_fifo_exit;
 	new_instance->sp_repl_sets_init = eio_fifo_cache_sets_init;

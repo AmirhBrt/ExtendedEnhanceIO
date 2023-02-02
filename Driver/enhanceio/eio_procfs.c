@@ -750,7 +750,7 @@ eio_time_based_clean_interval_sysctl(struct ctl_table *table, int write,
 
 		/* Reschedule the time based clean, based on new interval */
 		cancel_delayed_work_sync(&dmc->clean_aged_sets_work);
-		spin_lock_irqsave(&dmc->dirty_set_lru_lock, flags);
+        spin_lock_irqsave(&dmc->dirty_set_lfu_lock, flags);
 		dmc->is_clean_aged_sets_sched = 0;
 		if (dmc->sysctl_active.time_based_clean_interval
 		    && atomic64_read(&dmc->nr_dirty)) {
@@ -760,7 +760,7 @@ eio_time_based_clean_interval_sysctl(struct ctl_table *table, int write,
 					      HZ);
 			dmc->is_clean_aged_sets_sched = 1;
 		}
-		spin_unlock_irqrestore(&dmc->dirty_set_lru_lock, flags);
+        spin_unlock_irqrestore(&dmc->dirty_set_lfu_lock, flags);
 	}
 
 	return 0;

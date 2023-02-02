@@ -147,7 +147,7 @@ struct eio_policy *eio_rand_instance_init(void)
 
 	/* Initialize the rand specific functions and variables */
 	new_instance->sp_name = CACHE_REPL_RANDOM;
-	new_instance->sp_policy.lru = NULL;
+	new_instance->sp_policy.lfu = NULL;
 	new_instance->sp_repl_init = eio_rand_init;
 	new_instance->sp_repl_exit = eio_rand_exit;
 	new_instance->sp_repl_sets_init = eio_rand_cache_sets_init;

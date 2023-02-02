@@ -15,7 +15,7 @@ config ENHANCEIO
 	The caching engine is a loadable kernel module ("enhanceio.ko")
 	implemented as a device mapper target.	The cache replacement
 	policies are implemented as loadable kernel modules
-	("enhanceio_fifo.ko", "enhanceio_lru.ko") that register with
+	("enhanceio_fifo.ko", "enhanceio_lfu.ko") that register with
 	the caching engine module.
 
 	If unsure, say N.

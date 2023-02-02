@@ -127,20 +127,15 @@ int eio_policy_clean_set(struct eio_policy *p_ops, index_t set, int to_clean)
 }
 
 /*
- * LRU Specific functions
+ * LFU Specific functions
  */
-void eio_policy_lru_pushblks(struct eio_policy *p_ops)
-{
 
-	if (p_ops && p_ops->sp_name == CACHE_REPL_LRU)
-		p_ops->sp_policy.lru->sl_lru_pushblks(p_ops);
+void eio_policy_lfu_pushblks(struct eio_policy*p_ops){
+    if (p_ops && p_ops->sp_name == CACHE_REPL_LFU)
+        p_ops->sp_policy.lfu->sl_lfu_pushblks(p_ops);
 }
 
-void
-eio_policy_reclaim_lru_movetail(struct cache_c *dmc, index_t i,
-				struct eio_policy *p_ops)
-{
-
-	if (p_ops && p_ops->sp_name == CACHE_REPL_LRU)
-		p_ops->sp_policy.lru->sl_reclaim_lru_movetail(dmc, i, p_ops);
+void eio_policy_reclaim_lfu_movetail(struct cache_c* dmc, index_t i, struct eio_policy *p_ops){
+    if (p_ops && p_ops->sp_name == CACHE_REPL_LFU)
+        p_ops->sp_policy.lfu->sl_reclaim_lfu_movetail(dmc, i, p_ops);
 }

@@ -371,8 +371,7 @@ struct flash_cacheblock {
  * Cache replacement policy.
  */
 #define CACHE_REPL_FIFO         1
-#define CACHE_REPL_LRU          2
-#define CACHE_REPL_LFU          4
+#define CACHE_REPL_LFU          2
 #define CACHE_REPL_RANDOM       3
 #define CACHE_REPL_FIRST        CACHE_REPL_FIFO
 #define CACHE_REPL_LAST         CACHE_REPL_RANDOM
@@ -386,9 +385,8 @@ struct eio_policy_and_name {
 
 static const struct eio_policy_and_name eio_policy_names[] = {
 	{ CACHE_REPL_FIFO,   "fifo" },
-	{ CACHE_REPL_LRU,    "lru"  },
+	{ CACHE_REPL_LFU,    "lfu"  },
 	{ CACHE_REPL_RANDOM, "rand" },
-    { CACHE_REPL_LFU, "lfu"},
 };
 
 
@@ -676,7 +674,7 @@ struct eio_sysctl {
 };
 
 /* forward declaration */
-struct lru_ls;
+struct lfu_ls;
 
 /* Replacement for 'struct dm_dev' */
 struct eio_bdev {
@@ -783,8 +781,8 @@ struct cache_c {
 	u_int32_t random;                               /* Use for random replacement policy */
 	void *sp_cache_blk;                             /* Per cache-block data structure */
 	void *sp_cache_set;                             /* Per cache-set data structure */
-	struct lru_ls *dirty_set_lru;                   /* lru for dirty sets : lru_list_t */
-	spinlock_t dirty_set_lru_lock;                  /* spinlock for dirty set lru */
+    struct lfu_ls *dirty_set_lfu;                   /* lfu for dirty sets : lfu_list_t */
+    spinlock_t dirty_set_lfu_lock;                  /* spinlock for dirty set lfu */
 	struct delayed_work clean_aged_sets_work;       /* work item for clean_aged_sets */
 	int is_clean_aged_sets_sched;                   /* to know whether clean aged sets is scheduled */
 	struct workqueue_struct *mdupdate_q;            /* Workqueue to handle md updates */
@@ -946,8 +944,7 @@ void eio_clean_for_reboot(struct cache_c *dmc);
 void eio_clean_aged_sets(struct work_struct *work);
 void eio_comply_dirty_thresholds(struct cache_c *dmc, index_t set);
 #ifndef SSDCACHE
-void eio_reclaim_lru_movetail(struct cache_c *dmc, index_t index,
-			      struct eio_policy *);
+void eio_reclaim_lfu_movetail(struct cache_c *dmc, index_t index, struct eio_policy *);
 #endif                          /* !SSDCACHE */
 int eio_io_sync_vm(struct cache_c *dmc, struct eio_io_region *where, int rw,
 		   struct bio_vec *bvec, int nbvec);
@@ -999,7 +996,7 @@ extern void eio_do_readfill(struct work_struct *work);
 extern void eio_check_dirty_thresholds(struct cache_c *dmc, index_t set);
 extern void eio_clean_all(struct cache_c *dmc);
 extern int eio_clean_thread_proc(void *context);
-extern void eio_touch_set_lru(struct cache_c *dmc, index_t set);
+extern void eio_touch_set_lfu(struct cache_c *dmc, index_t set);
 extern void eio_inval_range(struct cache_c *dmc, sector_t iosector,
 			    unsigned iosize);
 extern int eio_invalidate_sanity_check(struct cache_c *dmc, u_int64_t iosector,
@@ -1149,7 +1146,7 @@ extern sector_t eio_get_device_start_sect(struct eio_bdev *);
 
 #define EIO_CLEAR_EVENT(ev)	((ev)->process = NULL)
 
-#include "eio_setlru.h"
+#include "eio_setlfu.h"
 #include "eio_policy.h"
 #define EIO_CACHE(dmc)          (EIO_MD8(dmc) ? (void *)dmc->cache_md8 : (void *)dmc->cache)
 
