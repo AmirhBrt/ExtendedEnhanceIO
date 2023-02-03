@@ -93,6 +93,8 @@ int lfu_add(struct lfu_ls *llist, index_t index, u_int64_t key)
             llist->ll_elem[llist->ll_elem[index].le_prev].le_next = LFU_NULL;
             llist->ll_elem[index].le_next = dest_index;
             llist->ll_elem[index].le_prev = llist->ll_elem[dest_index].le_prev;
+            if (llist->ll_elem[dest_index].le_prev != LFU_NULL)
+                llist->ll_elem[llist->ll_elem[dest_index].le_prev].le_next = index;
             llist->ll_elem[dest_index].le_prev = index;
             if (dest_index == llist->ll_head){
                 llist->ll_head = index;
